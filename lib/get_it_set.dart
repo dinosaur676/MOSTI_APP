@@ -4,11 +4,11 @@ import 'package:travel_hour/manager/api_manager.dart';
 import 'package:travel_hour/manager/controller_manager.dart';
 import 'package:travel_hour/manager/jwt_manager.dart';
 import 'package:travel_hour/manager/keycloak_manager.dart';
+import 'package:travel_hour/services/wallet_connect/chains/evm_service.dart';
+import 'package:travel_hour/services/wallet_connect/chains/i_chain.dart';
 import 'package:travel_hour/services/wallet_connect/i_web3wallet_service.dart';
 import 'package:travel_hour/services/wallet_connect/web3wallet_service.dart';
 
-import 'manager/chains/evm_service.dart';
-import 'manager/chains/i_chain.dart';
 
 Future<void> getItSetter() async {
     GetIt.instance.registerSingleton<Keycloak>(Keycloak());

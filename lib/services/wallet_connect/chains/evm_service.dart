@@ -9,14 +9,15 @@ import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mobile_scanner/mobile_scanner.dart' as scanner;
 import 'package:travel_hour/manager/address_manager.dart';
-import 'package:travel_hour/manager/chains/i_chain.dart';
 import 'package:travel_hour/models/address.dart';
+import 'package:travel_hour/services/wallet_connect/chains/i_chain.dart';
 import 'package:travel_hour/services/wallet_connect/i_web3wallet_service.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
 import 'package:web3dart/web3dart.dart';
 
-import '../../models/wallet_connect/eth/ethereum_transaction.dart';
-import '../../utils/wallet_connect/eth_utils.dart';
+import '../../../models/wallet_connect/eth/ethereum_transaction.dart';
+import '../../../utils/wallet_connect/eth_utils.dart';
+
 
 enum EVMChainId {
   ethereum,
