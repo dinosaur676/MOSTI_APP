@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "13082506823",
+    "project_id": "mosti-template",
+    "storage_bucket": "mosti-template.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13082506823:android:a0988e57edcca1ed126362",
+        "android_client_info": {
+          "package_name": "com.mrblab.travel_hour"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "13082506823-rigpeg75ef294pfrll4v7shms7ajlnh7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA2o3KtRlrM6zH0gx3As7Vyq_2yljQog8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "13082506823-rigpeg75ef294pfrll4v7shms7ajlnh7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "13082506823-84vtja62aumnocb0u3p19dsvd4rib1s9.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mrblab.travelhourapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

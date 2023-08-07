@@ -1,0 +1,43 @@
+name: walletconnect_flutter_v2
+description: WalletConnect v2 client made in dart for flutter.
+version: 2.0.15
+repository: https://github.com/WalletConnect/WalletConnectFlutterV2
+
+environment:
+  sdk: '>=2.19.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  web_socket_channel: ^2.4.0
+  http: '>=0.13.0 <1.2.0'
+  cryptography: ^2.0.5
+  convert: ^3.0.1
+  json_annotation: ^4.8.1
+  pointycastle: ^3.6.2
+  x25519: ^0.1.1
+  bs58: ^1.0.2
+  ed25519_edwards: ^0.3.1
+  # json_rpc_2: ^3.0.2
+  event: ^2.1.2
+  stream_channel: ^2.1.0
+  shared_preferences: ^2.0.17
+  universal_io: ^2.0.4
+  stack_trace: ^1.10.0
+  web3dart: ^2.5.1
+  logger: ^1.4.0
+  freezed_annotation: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk:
+      flutter
+  build_runner: ^2.0.0
+  json_serializable: ^6.5.3
+  dependency_validator: ^3.2.2
+  mockito: ^5.3.2
+  eth_sig_util: ^0.0.9
+  build_version: ^2.0.0
+  flutter_lints: ^2.0.0
+  freezed: ^2.4.0
+

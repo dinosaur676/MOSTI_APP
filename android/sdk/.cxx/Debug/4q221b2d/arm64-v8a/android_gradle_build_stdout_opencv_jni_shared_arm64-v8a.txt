@@ -1,0 +1,2 @@
+ninja: Entering directory `/Users/leekunho/Desktop/main_files/source/travel_hour/android/sdk/.cxx/Debug/4q221b2d/arm64-v8a'
+ninja: no work to do.
