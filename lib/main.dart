@@ -8,6 +8,7 @@ import 'app.dart';
 import 'firebase_options.dart';
 import 'get_it_set.dart';
 
+// testing commit.20230808
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
