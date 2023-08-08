@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:travel_hour/manager/jwt_manager.dart';
 
 class APIManager {
+  static final String URL_WALLET_CONNECT_LOG = "/api/wallet-connect-log";
+  static final String URL_WALLET = "/api/wallet";
+
   String _baseUri = "http://127.0.0.1:8490";
 
   Future<dynamic> GET(String uri) async {

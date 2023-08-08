@@ -21,7 +21,7 @@ class AdsBloc extends ChangeNotifier {
   //     _adsEnabled = _enabled;
   //     notifyListeners();
   //   }).catchError((e){
-  //     debugPrint('error : $e');
+  //     debug'Print('error : $e');
   //   });
   //   return _adsEnabled;
   // }

@@ -6,7 +6,9 @@ import 'package:eth_sig_util/eth_sig_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:travel_hour/manager/address_manager.dart';
+import 'package:travel_hour/manager/api_manager.dart';
 import 'package:travel_hour/models/address.dart';
+import 'package:travel_hour/models/api_models/wallet_connect_log.dart';
 import 'package:travel_hour/services/wallet_connect/i_web3wallet_service.dart';
 import 'package:travel_hour/utils/wallet_connect/dart_defines.dart';
 import 'package:walletconnect_flutter_v2/walletconnect_flutter_v2.dart';
@@ -32,10 +34,10 @@ class Web3WalletService extends IWeb3WalletService {
   /// [SessionProposalEvent], [AuthRequest]
   @override
   ValueNotifier<List<PairingInfo>> pairings =
-      ValueNotifier<List<PairingInfo>>([]);
+  ValueNotifier<List<PairingInfo>>([]);
   @override
   ValueNotifier<List<SessionData>> sessions =
-      ValueNotifier<List<SessionData>>([]);
+  ValueNotifier<List<SessionData>>([]);
   @override
   ValueNotifier<List<StoredCacao>> auth = ValueNotifier<List<StoredCacao>>([]);
 
@@ -66,13 +68,13 @@ class Web3WalletService extends IWeb3WalletService {
       ),
     );
 
-    // if (GetIt.instance.get<AddressManager>().isLoadMainCode) {
-    //   int addressCount = GetIt.instance.get<AddressManager>().getListLength();
-    //   for (int i = 0; i < addressCount; ++i) {
-    //     Address address = GetIt.instance.get<AddressManager>().getAddress(i)!;
-    //     regist(address);
-    //   }
-    // }
+    if (GetIt.instance.get<AddressManager>().isLoadMainCode) {
+      int addressCount = GetIt.instance.get<AddressManager>().getListLength();
+      for (int i = 0; i < addressCount; ++i) {
+        Address address = GetIt.instance.get<AddressManager>().getAddress(i)!;
+        regist(address);
+      }
+    }
 
     // Setup our accounts
     // List<ChainKey> chainKeys = GetIt.I<IKeyService>().getKeys();
@@ -164,10 +166,6 @@ class Web3WalletService extends IWeb3WalletService {
       // );
       // print('approved: $approved');
 
-      final WCSessionRequestModel sessionProposal =
-          WCSessionRequestModel(request: args.params);
-      final ConnectionMetadata? metadata = sessionProposal.request.proposer;
-
       final bool? approved = true;
 
       if (approved != null && approved) {
@@ -198,6 +196,22 @@ class Web3WalletService extends IWeb3WalletService {
     if (args != null) {
       print(args);
       sessions.value.add(args.session);
+
+      final peer = args.session.peer;
+      PairingMetadata pairingMetadata = peer.metadata;
+      Address address = GetIt.instance.get<AddressManager>()
+          .getSelectedAddress()!;
+
+      String publicKey = address.getAddressToString()[Address.PUBLIC_KEY];
+
+
+      GetIt.instance.get<APIManager>().PUT(APIManager.URL_WALLET_CONNECT_LOG,
+          getWalletConnectLogInsertParam(
+              name: pairingMetadata.name ,
+              description: pairingMetadata.description,
+              url: pairingMetadata.url,
+              publicKey: publicKey)
+      );
     }
   }
 
@@ -209,12 +223,13 @@ class Web3WalletService extends IWeb3WalletService {
       // );
       // Create the message to be signed
       Address? address =
-          GetIt.instance.get<AddressManager>().getSelectedAddress();
+      GetIt.instance.get<AddressManager>().getSelectedAddress();
 
       if (address == null) return null;
 
       final String iss =
-          'did:pkh:eip155:1:${address!.getAddressToString()[Address.PUBLIC_KEY]}';
+          'did:pkh:eip155:1:${address!.getAddressToString()[Address
+          .PUBLIC_KEY]}';
 
       // print(args);
       // final Widget w = WCRequestWidget(

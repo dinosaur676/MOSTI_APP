@@ -104,7 +104,7 @@ class _ItemList extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 16,
                       color: Colors.white,
-                      fontWeight: FontWeight.w500),
+                      fontWeight: FontWeight.w500)
                 ),
               ),
             ),

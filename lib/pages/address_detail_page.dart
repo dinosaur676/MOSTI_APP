@@ -12,6 +12,8 @@ import 'package:walletconnect_flutter_v2/apis/web3wallet/web3wallet.dart';
 import 'package:travel_hour/utils/wallet_connect/constants.dart';
 import 'package:travel_hour/widgets/wallet_connect/uri_input_popup.dart';
 
+import '../models/api_models/wallet_connect_log.dart';
+
 class AddressDetailPage extends StatefulWidget {
   final Address address;
 
@@ -23,6 +25,18 @@ class AddressDetailPage extends StatefulWidget {
 
 class _AddressDetailPageState extends State<AddressDetailPage> {
   final Web3Wallet web3Wallet = GetIt.I<IWeb3WalletService>().getWeb3Wallet();
+
+  @override
+  void initState() {
+    super.initState();
+    GetIt.instance.get<AddressManager>().selectAddress(widget.address);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    GetIt.instance.get<AddressManager>().selectAddress(null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +54,8 @@ class _AddressDetailPageState extends State<AddressDetailPage> {
                   height: 1,
                   color: Colors.grey,
                 ),
-                _SubHeader(address: widget.address)
+                _SubHeader(address: widget.address),
+                Expanded(child: _Body())
               ],
             ),
           ),
@@ -170,6 +185,61 @@ class _SubHeader extends StatelessWidget {
     );
   }
 }
+
+class _Body extends StatefulWidget {
+  const _Body({Key? key}) : super(key: key);
+
+  @override
+  State<_Body> createState() => _BodyState();
+}
+
+class _BodyState extends State<_Body> {
+
+  dynamic getData;
+
+  @override
+  void initState() {
+    super.initState();
+
+    String publicKey = GetIt.instance.get<AddressManager>().getSelectedAddress()!.getAddressToString()[Address.PUBLIC_KEY];
+    getData = GetIt.instance.get<APIManager>().POST(APIManager.URL_WALLET_CONNECT_LOG,
+        getWalletConnectLogSelectParam(publicKey: publicKey));
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: getData,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+
+          if(snapshot.hasData == false || snapshot.connectionState != ConnectionState.done)
+            return CircularProgressIndicator();
+
+          else if (snapshot.hasError) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: TextStyle(fontSize: 15),
+              ),
+            );
+          }
+          // 데이터를 정상적으로 받아오게 되면 다음 부분을 실행하게 되는 것이다.
+          else {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                snapshot.data.toString(),
+                style: TextStyle(fontSize: 15),
+              ),
+            );
+          }
+
+    });
+  }
+}
+
 
 class Bottom extends StatefulWidget {
   final Web3Wallet web3Wallet;

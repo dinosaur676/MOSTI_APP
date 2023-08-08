@@ -16,6 +16,11 @@ Future<void> getItSetter() async {
     GetIt.instance.registerSingleton<APIManager>(APIManager());
     GetIt.instance.registerSingleton(ControllerManager());
 
+    AddressManager addressManager = AddressManager();
+    await addressManager.initMainCode();
+
+    GetIt.instance.registerSingleton<AddressManager>(addressManager);
+
     final IWeb3WalletService web3WalletService = Web3WalletService();
     web3WalletService.create();
     GetIt.I.registerSingleton<IWeb3WalletService>(web3WalletService);
@@ -38,8 +43,4 @@ Future<void> getItSetter() async {
     await web3WalletService.init();
 
 
-    AddressManager addressManager = AddressManager();
-    //await addressManager.initMainCode();
-
-    GetIt.instance.registerSingleton<AddressManager>(addressManager);
 }

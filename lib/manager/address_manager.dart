@@ -20,7 +20,6 @@ import 'package:external_path/external_path.dart';
 
 class AddressManager {
   List<Address> _addressList = [];
-  Directory? _directory;
   String _mainCodeData = "";
 
   bool _loadMainCode = false;
@@ -37,8 +36,7 @@ class AddressManager {
   final _storage = new FlutterSecureStorage();
 
   AddressManager() {
-    //_initDirectory();
-    test();
+
   }
 
   void test() {
@@ -65,30 +63,20 @@ class AddressManager {
     _selectedAddress = address;
   }
 
-
-
-  Future<void> _initDirectory() async {
-    if(Platform.isIOS)
-      _directory = await getApplicationDocumentsDirectory();
-    else if(Platform.isAndroid)
-      _directory = await getExternalStorageDirectory();
-  }
-
   void createAddress(String walletName, String walletTag) {
     _addressList.add(Address(_mainCodeData, walletName, walletTag));
     saveAddress();
     GetIt.instance.get<IWeb3WalletService>().regist(_addressList.last);
   }
 
-  void deleteAddress(String walletName, String walletTag) {
+  void deleteAddress(String walletName, String walletTag) async {
     for(int i = 0; i < _addressList.length; ++i) {
       Address address = _addressList[i];
       if(address.walletTag == walletTag && address.walletName == walletName) {
+        await _storage.delete(key: getAddressKey(i));
         _addressList.removeAt(i);
       }
     }
-
-    saveAddress();
   }
 
   void saveAddress() async {
@@ -103,7 +91,7 @@ class AddressManager {
       jsonWalletMap[_jsonWalletName] = address.walletName;
       jsonWalletMap[_jsonWalletTag] = address.walletTag;
 
-      await _storage.write(key: getJsonKey(i), value: jsonEncode(jsonWalletMap));
+      await _storage.write(key: getAddressKey(i), value: jsonEncode(jsonWalletMap));
     }
   }
 
@@ -112,13 +100,13 @@ class AddressManager {
     if(_loadMainCode)
       return;
 
-    final jsonData = await _getJsonData();
+    final storage = await _storage.read(key: _mainCodeKey);
 
-    if(jsonData[_mainCodeKey] == null) {
+    if(storage == null) {
       return;
     }
 
-    _mainCodeData = jsonData[_mainCodeKey];
+    _mainCodeData = storage;
     _loadAddress();
 
     _loadMainCode = true;
@@ -141,18 +129,10 @@ class AddressManager {
     saveAddress();
   }
 
-  String _getFilePath() {
-    if(_directory == null)
-      return "";
-
-    return _directory!.path + "/" + _fileName;
-  }
-
-
   void _loadAddress() async {
     int index = 0;
     while(true) {
-      String key = getJsonKey(index);
+      String key = getAddressKey(index);
 
       String? value = await _storage.read(key: key);
 
@@ -169,20 +149,7 @@ class AddressManager {
     }
   }
 
-  dynamic _getJsonData() async {
-    File file = File(_getFilePath());
-    if(!await file.exists())
-      return {};
-    return json.decode(await file.readAsString());
-  }
-
-  Future<List<String>> _readMnemonicWord() async {
-    String output = await rootBundle.loadString("assets/english.txt");
-
-    return output.split("\n");
-  }
-
-  String getJsonKey(int index) {
+  String getAddressKey(int index) {
     return "Address" + index.toString();
   }
 }

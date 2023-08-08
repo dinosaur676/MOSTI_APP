@@ -13,6 +13,8 @@ PODS:
   - flutter_appauth (0.0.1):
     - AppAuth (= 1.6.2)
     - Flutter
+  - flutter_secure_storage (6.0.0):
+    - Flutter
   - flutter_trust_wallet_core (0.0.1):
     - Flutter
   - flutter_web_browser (0.17.1):
@@ -173,6 +175,7 @@ DEPENDENCIES:
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
   - Flutter (from `Flutter`)
   - flutter_appauth (from `.symlinks/plugins/flutter_appauth/ios`)
+  - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - flutter_trust_wallet_core (from `.symlinks/plugins/flutter_trust_wallet_core/ios`)
   - flutter_web_browser (from `.symlinks/plugins/flutter_web_browser/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
@@ -226,6 +229,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_appauth:
     :path: ".symlinks/plugins/flutter_appauth/ios"
+  flutter_secure_storage:
+    :path: ".symlinks/plugins/flutter_secure_storage/ios"
   flutter_trust_wallet_core:
     :path: ".symlinks/plugins/flutter_trust_wallet_core/ios"
   flutter_web_browser:
@@ -271,6 +276,7 @@ SPEC CHECKSUMS:
   camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_appauth: cf9b928962105b2a64a9802585d1c8adaf3e0f46
+  flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
   flutter_trust_wallet_core: 0d8b4bd94a053e818c6e7ff0a8b1e1298f4a08a6
   flutter_web_browser: 7bccaafbb0c5b8862afe7bcd158f15557109f61f
   fluttertoast: fafc4fa4d01a6a9e4f772ecd190ffa525e9e2d9c
