@@ -42,5 +42,6 @@ Future<void> getItSetter() async {
 
     await web3WalletService.init();
 
+    GetIt.instance.get<AddressManager>().test();
 
 }

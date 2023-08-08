@@ -28,7 +28,6 @@ class AddressManager {
 
   bool get isLoadMainCode => _loadMainCode;
 
-  final String _fileName = "address.json";
   final String _jsonWalletTag = "walletTag";
   final String _jsonWalletName = "walletName";
   final String _mainCodeKey = "mnemonic";
@@ -41,6 +40,7 @@ class AddressManager {
 
   void test() {
     _mainCodeData = "1234567890abedef12345678";
+    deleteAddress("asdfasdf", "aef197");
     createAddress("asdfasdf", "aef197");
   }
 
