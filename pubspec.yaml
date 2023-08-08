@@ -35,7 +35,7 @@ dependencies:
   get_it: ^7.6.0
   html_unescape: ^2.0.0
   http: ^0.13.6
-  intl: ^0.17.0
+  intl: ^0.18.0
   launch_review: ^3.0.1
   line_icons: ^2.0.1
   package_info: ^2.0.2
