@@ -8,6 +8,7 @@ import 'package:travel_hour/manager/controller_manager.dart';
 import 'package:travel_hour/models/address.dart';
 import 'package:travel_hour/pages/qr_scan_page.dart';
 import 'package:travel_hour/services/wallet_connect/i_web3wallet_service.dart';
+import 'package:travel_hour/widgets/wallet_connect/pairing_item.dart';
 import 'package:walletconnect_flutter_v2/apis/web3wallet/web3wallet.dart';
 import 'package:travel_hour/utils/wallet_connect/constants.dart';
 import 'package:travel_hour/widgets/wallet_connect/uri_input_popup.dart';
@@ -48,12 +49,12 @@ class _AddressDetailPageState extends State<AddressDetailPage> {
           Expanded(
             child: Column(
               children: [
-                _Header(addressName: widget.address.walletName),
-                Divider(
-                  thickness: 1,
-                  height: 1,
-                  color: Colors.grey,
-                ),
+                //_Header(addressName: widget.address.walletName),
+                // Divider(
+                //   thickness: 1,
+                //   height: 1,
+                //   color: Colors.grey,
+                // ),
                 _SubHeader(address: widget.address),
                 Expanded(child: _Body())
               ],
@@ -67,6 +68,7 @@ class _AddressDetailPageState extends State<AddressDetailPage> {
                 Bottom(
                   address: widget.address,
                   web3Wallet: web3Wallet,
+                  onSetState: onSetState,
                 ),
               ],
             ),
@@ -74,6 +76,12 @@ class _AddressDetailPageState extends State<AddressDetailPage> {
         ],
       ),
     );
+  }
+
+  void onSetState() {
+    setState(() {
+
+    });
   }
 }
 
@@ -194,17 +202,19 @@ class _Body extends StatefulWidget {
 }
 
 class _BodyState extends State<_Body> {
-
   dynamic getData;
 
   @override
   void initState() {
     super.initState();
 
-    String publicKey = GetIt.instance.get<AddressManager>().getSelectedAddress()!.getAddressToString()[Address.PUBLIC_KEY];
-    getData = GetIt.instance.get<APIManager>().POST(APIManager.URL_WALLET_CONNECT_LOG,
+    String publicKey = GetIt.instance
+        .get<AddressManager>()
+        .getSelectedAddress()!
+        .getAddressToString()[Address.PUBLIC_KEY];
+    getData = GetIt.instance.get<APIManager>().POST(
+        APIManager.URL_WALLET_CONNECT_LOG,
         getWalletConnectLogSelectParam(publicKey: publicKey));
-
   }
 
   @override
@@ -212,10 +222,13 @@ class _BodyState extends State<_Body> {
     return FutureBuilder(
         future: getData,
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-
-          if(snapshot.hasData == false || snapshot.connectionState != ConnectionState.done)
-            return CircularProgressIndicator();
-
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Container(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
           else if (snapshot.hasError) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
@@ -227,26 +240,46 @@ class _BodyState extends State<_Body> {
           }
           // 데이터를 정상적으로 받아오게 되면 다음 부분을 실행하게 되는 것이다.
           else {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                snapshot.data.toString(),
-                style: TextStyle(fontSize: 15),
-              ),
-            );
-          }
+            List list = [];
+            if(snapshot.data != null)
+              list = snapshot.data;
 
-    });
+            return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: getList(list));
+          }
+        });
+  }
+
+  Widget getList(List data) {
+    if(data == null) {
+      return Container();
+    }
+
+    List<PairingItem> pairingItems = data.map((e) => PairingItem(
+              pairingInfo: e,
+    )).toList();
+
+
+    return ListView.builder(
+        itemCount: pairingItems.length,
+        itemBuilder: (BuildContext conext, int index) {
+          return pairingItems[index];
+        });
   }
 }
-
 
 class Bottom extends StatefulWidget {
   final Web3Wallet web3Wallet;
   final Address address;
+  final void Function() onSetState;
 
-  const Bottom({required this.web3Wallet, required this.address, Key? key})
-      : super(key: key);
+  const Bottom({
+    required this.web3Wallet,
+    required this.address,
+    required this.onSetState,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<Bottom> createState() => _BottomState();
@@ -319,16 +352,17 @@ class _BottomState extends State<Bottom> {
       },
     );
 
-    // print(uri);
-
     _onFoundUri(uri);
+
+    widget.onSetState();
   }
 
   Future _onScanQrCode() async {
-    final String? s = await Navigator.push(context, MaterialPageRoute(
-        builder: (context) => QRScanPage(title: "QRScan")));
+    final String? s = await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => QRScanPage(title: "QRScan")));
 
     _onFoundUri(s);
+    widget.onSetState();
   }
 
   Future _onFoundUri(String? uri) async {

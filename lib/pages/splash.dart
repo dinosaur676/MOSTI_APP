@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_hour/blocs/sign_in_bloc.dart';
 import 'package:travel_hour/config/config.dart';
 import 'package:travel_hour/pages/done.dart';
 import 'package:travel_hour/pages/sign_in.dart';
@@ -21,7 +20,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin{
 
 
   afterSplash(){
-    final SignInBloc sb = context.read<SignInBloc>();
     Future.delayed(Duration(milliseconds: 1200)).then((value){
       gotoDonePage();
     });
@@ -29,10 +27,6 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin{
 
 
   gotoHomePage () {
-    final SignInBloc sb = context.read<SignInBloc>();
-    if(sb.isSignedIn == true){ 
-      sb.getDataFromSp();
-    }
     nextScreenReplace(context, HomePage());
   }
 

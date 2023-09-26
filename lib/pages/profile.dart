@@ -1,16 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:get_it/get_it.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_hour/blocs/notification_bloc.dart';
-import 'package:travel_hour/blocs/sign_in_bloc.dart';
 import 'package:travel_hour/config/config.dart';
-import 'package:travel_hour/pages/edit_profile.dart';
-import 'package:travel_hour/pages/notifications.dart';
-import 'package:travel_hour/pages/security.dart';
+import 'package:travel_hour/manager/profile_manager.dart';
 import 'package:travel_hour/pages/sign_in.dart';
-import 'package:travel_hour/services/app_service.dart';
 import 'package:travel_hour/utils/next_screen.dart';
 import 'package:travel_hour/widgets/image_view.dart';
 import 'package:travel_hour/widgets/language.dart';
@@ -27,20 +23,13 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClientMixin{
 
-
-
-  
-
-
-  openAboutDialog (){
-    final sb = context.read<SignInBloc>();
+  openAboutDialog () {
     showDialog(
       context: context,
       builder: (BuildContext context){
         return AboutDialog(
           applicationName: Config().appName,
           applicationIcon: Image(image: AssetImage(Config().splashIcon), height: 30, width: 30,),
-          applicationVersion: sb.appVersion,
         );
       }
     );
@@ -59,20 +48,15 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final sb = context.watch<SignInBloc>();
     return Scaffold(
-      appBar: AppBar(
-        title: Text('profile').tr(),
-        centerTitle: false,
-        actions: [
-          IconButton(icon: Icon(LineIcons.bell, size: 25), onPressed: ()=> nextScreen(context, NotificationsPage()))
-        ],
-        
-      ),
       body: ListView(
         padding: EdgeInsets.fromLTRB(15, 20, 15, 50),
         children: [
-          sb.isSignedIn == false ? GuestUserUI() : UserUI(),
+          Text("profile", style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600
+          ),).tr(),
+          GetIt.instance.get<ProfileManager>().isSignedIn == false ? GuestUserUI() : UserUI(),
 
           Text("general setting", style: TextStyle(
             fontSize: 20,
@@ -92,12 +76,6 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               ),
               child: Icon(Feather.bell, size: 20, color: Colors.white),
             ),
-            trailing:  Switch.adaptive(
-                activeColor: Theme.of(context).primaryColor,
-                value: context.watch<NotificationBloc>().subscribed,
-                onChanged: (bool newValue) {
-                  //context.read<NotificationBloc>().handleSubscription(context, newValue);
-                }),
           ),
           Divider(height: 5,),
 
@@ -129,7 +107,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               child: Icon(Feather.mail, size: 20, color: Colors.white),
             ),
             trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()async=> await AppService().openEmailSupport(context),
+            onTap: ()async=> await {}
           ),
           Divider(height: 5,),
 
@@ -145,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               child: Icon(Feather.star, size: 20, color: Colors.white),
             ),
             trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()async=> AppService().launchAppReview(context),
+            onTap: ()async=> {}
           ),
 
           Divider(height: 5,),
@@ -162,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               child: Icon(Feather.lock, size: 20, color: Colors.white),
             ),
             trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()=> AppService().openLinkWithCustomTab(context, Config().privacyPolicyUrl),
+            onTap: ()=> {}
           ),
           Divider(height: 5,),
 
@@ -178,44 +156,12 @@ class _ProfilePageState extends State<ProfilePage> with AutomaticKeepAliveClient
               child: Icon(Feather.info, size: 20, color: Colors.white),
             ),
             trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()=> AppService().openLinkWithCustomTab(context, Config().yourWebsiteUrl),
+            onTap: ()=> {}
           ),
 
-          sb.guestUser == true ? Container() : SecurityOption(textStyle: _textStyle,),
+          GetIt.instance.get<ProfileManager>().isSignedIn == false ? Container() : SecurityOption(textStyle: _textStyle,),
 
           Divider(height: 10,),
-
-          ListTile(
-            title: Text('facebook', style: _textStyle).tr(),
-            leading: Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                color: Colors.indigo,
-                borderRadius: BorderRadius.circular(5)
-              ),
-              child: Icon(Feather.facebook, size: 20, color: Colors.white),
-            ),
-            trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()=> AppService().openLink(context, Config().facebookPageUrl),
-          ),
-
-          Divider(height: 10,),
-
-          ListTile(
-            title: Text('youtube', style: _textStyle).tr(),
-            leading: Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                color: Colors.redAccent,
-                borderRadius: BorderRadius.circular(5)
-              ),
-              child: Icon(Feather.youtube, size: 20, color: Colors.white),
-            ),
-            trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()=> AppService().openLink(context, Config().youtubeChannelUrl),
-          ),
         ],
       )
       
@@ -251,7 +197,7 @@ class SecurityOption extends StatelessWidget {
               child: Icon(Feather.settings, size: 20, color: Colors.white),
             ),
             trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()=> nextScreen(context, SecurityPage()),
+            onTap: ()=> {},
           ),
       ],
     );
@@ -300,7 +246,6 @@ class UserUI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sb = context.watch<SignInBloc>();
     TextStyle _textStyle = TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w500,
@@ -312,27 +257,17 @@ class UserUI extends StatelessWidget {
           height: 200,
           child: Column(
             children: [
-              InkWell(
-                child: CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Colors.grey[300],
-                  backgroundImage: CachedNetworkImageProvider(sb.imageUrl!)
-                ),
-                onTap: ()=> nextScreen(context, FullScreenImage(imageUrl: sb.imageUrl!)),
+              CircleAvatar(
+                radius: 60,
+                backgroundColor: Colors.grey[300],
               ),
               SizedBox(height: 10,),
-              Text(sb.name!, style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                letterSpacing: -0.6,
-                wordSpacing: 2
-              ),)
             ],
           ),
         ),
 
         ListTile(
-            title: Text(sb.email!, style: _textStyle,),
+            title: Text(GetIt.instance.get<ProfileManager>().email),
             leading: Container(
               height: 30,
               width: 30,
@@ -343,37 +278,6 @@ class UserUI extends StatelessWidget {
               child: Icon(Feather.mail, size: 20, color: Colors.white),
             ),
           ),
-          Divider(height: 5,),
-
-          ListTile(
-            title: Text(sb.joiningDate!, style: _textStyle,),
-            leading: Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(5)
-              ),
-              child: Icon(LineIcons.timesCircle, size: 20, color: Colors.white),
-            ),
-          ),
-          Divider(height: 5,),
-
-          ListTile(
-            title: Text('edit profile', style: _textStyle,).tr(),
-            leading: Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                color: Colors.purpleAccent,
-                borderRadius: BorderRadius.circular(5)
-              ),
-              child: Icon(Feather.edit_3, size: 20, color: Colors.white),
-            ),
-            trailing: Icon(Feather.chevron_right, size: 20,),
-            onTap: ()=> nextScreen(context, EditProfile(name: sb.name, imageUrl: sb.imageUrl))
-          ),
-
           Divider(height: 5,),
 
           ListTile(

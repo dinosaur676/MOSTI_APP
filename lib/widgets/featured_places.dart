@@ -2,20 +2,14 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_hour/blocs/featured_bloc.dart';
 import 'package:travel_hour/manager/address_manager.dart';
 import 'package:travel_hour/models/address.dart';
-import 'package:travel_hour/models/place.dart';
 import 'package:travel_hour/pages/address_add.dart';
-import 'package:travel_hour/pages/more_places.dart';
-import 'package:travel_hour/pages/place_details.dart';
-import 'package:travel_hour/utils/next_screen.dart';
+import 'package:travel_hour/utils/wallet_connect/constants.dart';
 import 'package:travel_hour/widgets/address_card.dart';
-import 'package:travel_hour/widgets/custom_cache_image.dart';
-import 'package:travel_hour/utils/loading_cards.dart';
 import 'package:travel_hour/pages/address_detail_page.dart';
+import 'package:travel_hour/widgets/wallet_connect/custom_button.dart';
 
 class Featured extends StatefulWidget {
   Featured({Key? key}) : super(key: key);
@@ -24,86 +18,24 @@ class Featured extends StatefulWidget {
 }
 
 class _FeaturedState extends State<Featured> {
+  int addressIndex = 0;
+
   @override
   Widget build(BuildContext context) {
-    final fb = context.watch<FeaturedBloc>();
-    double w = MediaQuery
-        .of(context)
-        .size
-        .width;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          margin: EdgeInsets.only(left: 15, top: 15, right: 10, bottom: 15.0),
-          child: Row(
-            children: <Widget>[
-              Text(
-                'my avatar',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[900],
-                    wordSpacing: 1,
-                    letterSpacing: -0.6),
-              ).tr(),
-              Spacer(),
-            ],
+    return SafeArea(
+      bottom: true,
+      child: Column(
+        children: <Widget>[
+          Header(),
+          Body(),
+          SizedBox(
+            height: 8,
           ),
-        ),
-        Container(
-          height: 260,
-          width: w,
-          child: PageView.builder(
-            controller: PageController(initialPage: 0),
-            scrollDirection: Axis.horizontal,
-            itemCount: GetIt.instance.get<AddressManager>().getListLength() + 1,
-            onPageChanged: (index) {
-              context.read<FeaturedBloc>().setListIndex(index);
-            },
-            itemBuilder: (BuildContext context, int index) {
-              // if(fb.data.isEmpty) return LoadingFeaturedCard();
-              // return _FeaturedItemList(d: fb.data[index]);
-
-              print(index);
-
-              if (GetIt.instance.get<AddressManager>().getListLength() ==
-                  index) {
-                return GestureDetector(
-                    onTap: onTap, child: AddressAddFeaturedCard());
-              }
-
-              Address? address =
-              GetIt.instance.get<AddressManager>().getAddress(index);
-
-              if (address != null)
-                return GestureDetector(
-                  onTap: () => onTapAddressCard(address), child: AddressFeaturedCard(address: address));
-            },
-          ),
-        ),
-        SizedBox(
-          height: 8,
-        ),
-        Center(
-          child: DotsIndicator(
-            dotsCount: GetIt.instance.get<AddressManager>().getListLength() + 1,
-            position: context
-                .watch<FeaturedBloc>()
-                .listIndex,
-            decorator: DotsDecorator(
-              color: Colors.black26,
-              activeColor: Colors.black,
-              spacing: EdgeInsets.only(left: 6),
-              size: const Size.square(5.0),
-              activeSize: const Size(20.0, 4.0),
-              activeShape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5)),
-            ),
-          ),
-        )
-      ],
+          Dot(),
+          Expanded(child: Bottom())
+        ],
+      ),
     );
   }
 
@@ -116,17 +48,10 @@ class _FeaturedState extends State<Featured> {
         ),
         builder: (_) {
           return SizedBox(
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.9,
+            height: MediaQuery.of(context).size.height * 0.9,
             child: AddressDetailPage(address: address),
           );
         });
-
-    setState(() {
-      print("setState Test");
-    });
   }
 
   void onTap() async {
@@ -138,10 +63,7 @@ class _FeaturedState extends State<Featured> {
         ),
         builder: (_) {
           return SizedBox(
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.9,
+            height: MediaQuery.of(context).size.height * 0.9,
             child: AddAddressPage(),
           );
         });
@@ -149,157 +71,108 @@ class _FeaturedState extends State<Featured> {
       print("setState Test");
     });
   }
-}
 
-class _FeaturedItemList extends StatelessWidget {
-  final Place d;
-
-  const _FeaturedItemList({Key? key, required this.d}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    double w = MediaQuery
-        .of(context)
-        .size
-        .width;
-    return Container(
-      padding: const EdgeInsets.only(left: 20, right: 20),
-      width: w,
-      child: InkWell(
-        child: Stack(
-          children: <Widget>[
-            Hero(
-              tag: 'featured${d.timestamp}',
-              child: Container(
-                  height: 220,
-                  width: w,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[400],
-                      borderRadius: BorderRadius.circular(10)),
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: CustomCacheImage(imageUrl: d.imageUrl1))),
-            ),
-            Positioned(
-              height: 120,
-              width: w * 0.70,
-              left: w * 0.11,
-              bottom: 10,
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                          color: Colors.grey[200]!,
-                          offset: Offset(0, 2),
-                          blurRadius: 2)
-                    ]),
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          d.name!,
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Icon(
-                            Icons.location_on,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
-                          Expanded(
-                            child: Text(
-                              d.location!,
-                              style: TextStyle(
-                                  fontSize: 13, fontWeight: FontWeight.w400),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          )
-                        ],
-                      ),
-                      Divider(
-                        color: Colors.grey[300],
-                        height: 20,
-                      ),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Icon(
-                              LineIcons.heart,
-                              size: 18,
-                              color: Colors.orange,
-                            ),
-                            Text(
-                              d.loves.toString(),
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[700]),
-                            ),
-                            SizedBox(
-                              width: 30,
-                            ),
-                            Icon(
-                              LineIcons.commentAlt,
-                              size: 18,
-                              color: Colors.orange,
-                            ),
-                            Text(
-                              d.commentsCount.toString(),
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey[700]),
-                            ),
-                            Spacer(),
-                          ],
-                        ),
-                      )
-                    ],
+  Widget Bottom() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.25,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: StyleConstants.successColor
+                ),
+                onPressed: () {
+                  Navigator.pop(
+                      context, addressIndex);
+                },
+                child: Text(
+                  "선택",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w300
                   ),
                 ),
               ),
             ),
           ],
         ),
-        onTap: () {
-          nextScreen(
-              context, PlaceDetails(data: d, tag: 'featured${d.timestamp}'));
+      ],
+    );
+  }
+
+  Widget Header() {
+    return Container(
+      margin: EdgeInsets.only(left: 15, top: 15, right: 10, bottom: 15.0),
+      child: Row(
+        children: <Widget>[
+          Text(
+            'my avatar',
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[900],
+                wordSpacing: 1,
+                letterSpacing: -0.6),
+          ).tr(),
+          Spacer(),
+        ],
+      ),
+    );
+  }
+
+  Widget Body() {
+    double w = MediaQuery.of(context).size.width;
+
+    return Container(
+      height: 260,
+      width: w,
+      child: PageView.builder(
+        controller: PageController(initialPage: 0),
+        scrollDirection: Axis.horizontal,
+        itemCount: GetIt.instance.get<AddressManager>().getListLength() + 1,
+        onPageChanged: (index) {
+          addressIndex = index;
+
+          print(addressIndex);
+        },
+        itemBuilder: (BuildContext context, int index) {
+          // if(fb.data.isEmpty) return LoadingFeaturedCard();
+          // return _FeaturedItemList(d: fb.data[index]);
+
+          if (GetIt.instance.get<AddressManager>().getListLength() == index) {
+            return GestureDetector(
+                onTap: onTap, child: AddressAddFeaturedCard());
+          }
+
+          Address? address =
+              GetIt.instance.get<AddressManager>().getAddress(index);
+
+          if (address != null) return AddressFeaturedCard(address: address);
         },
       ),
     );
   }
-}
 
-class _EmptyContent extends StatelessWidget {
-  const _EmptyContent({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, bottom: 20),
-      height: 220,
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
-      decoration: BoxDecoration(
-          color: Colors.grey[200], borderRadius: BorderRadius.circular(15)),
-      child: Center(
-        child: Text("No contents found!"),
+  Widget Dot() {
+    return Center(
+      child: DotsIndicator(
+        dotsCount: GetIt.instance.get<AddressManager>().getListLength() + 1,
+        decorator: DotsDecorator(
+          color: Colors.black26,
+          activeColor: Colors.black,
+          spacing: EdgeInsets.only(left: 6),
+          size: const Size.square(5.0),
+          activeSize: const Size(20.0, 4.0),
+          activeShape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        ),
       ),
     );
   }

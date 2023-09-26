@@ -3,21 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get_it/get_it.dart';
-import 'package:travel_hour/blocs/ads_bloc.dart';
-import 'package:travel_hour/blocs/notification_bloc.dart';
+import 'package:travel_hour/config/config.dart';
 import 'package:travel_hour/manager/address_manager.dart';
 import 'package:travel_hour/manager/keycloak_manager.dart';
-import 'package:travel_hour/pages/blogs.dart';
-import 'package:travel_hour/pages/bookmark.dart';
-import 'package:travel_hour/pages/explore.dart';
+import 'package:travel_hour/pages/bedge_home_page.dart';
+import 'package:travel_hour/pages/notice_page.dart';
+import 'package:travel_hour/pages/address_home_page.dart';
+import 'package:travel_hour/pages/mint_wait.dart';
 import 'package:travel_hour/pages/profile.dart';
-import 'package:provider/provider.dart';
-import 'package:travel_hour/pages/states.dart';
-import 'package:travel_hour/services/app_service.dart';
-import 'package:travel_hour/utils/snacbar.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-import '../services/notification_service.dart';
+import '../models/address.dart';
+import '../widgets/featured_places.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -26,72 +23,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   int _currentIndex = 0;
   PageController _pageController = PageController();
 
   List<IconData> iconList = [
     Feather.home,
     Feather.grid,
-    Feather.list,
-    Feather.bookmark,
+    Icons.list,
+    Icons.notifications,
     Feather.user
   ];
 
-
   void onTabTapped(int index) {
-    setState(()=> _currentIndex = index);
-   _pageController.animateToPage(index,
-      curve: Curves.easeIn,
-      duration: Duration(milliseconds: 300)
-    );
-   
+    setState(() => _currentIndex = index);
+    _pageController.animateToPage(index,
+        curve: Curves.easeIn, duration: Duration(milliseconds: 300));
   }
 
-
-  Future configureAds ()async{
-    await context.read<AdsBloc>().initiateAdsOnApp();
-    context.read<AdsBloc>().loadAds();
-  }
-
-
-  Future _initNotifications () async{
-    // await NotificationService().initFirebasePushNotification(context)
-    // .then((value)=> context.read<NotificationBloc>().checkPermission());
-  }
-
-
-
- @override
+  @override
   void initState() {
     super.initState();
-    _initNotifications();
-    AppService().checkInternet().then((hasInternet) {
-      if (hasInternet == false) {
-       openSnacbar(context, 'no internet'.tr());
-      }
-    });
-
-
-
-    Future.delayed(Duration(milliseconds: 0))
-    .then((_) async{
-
-      //await GetIt.I.get<AddressManager>().initDirectory();
-
-      // await context.read<AdsBloc>().checkAdsEnable().then((isEnabled)async{
-      //   if(isEnabled != null && isEnabled == true){
-      //     debugPrint('ads enabled true');
-      //     configureAds();      /* enable this line to enable ads on the app */
-      //
-      //   }else{
-      //     debugPrint('ads enabled false');
-      //   }
-      // });
-    });
   }
-  
-
 
   @override
   void dispose() {
@@ -100,13 +52,14 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-
-  Future _onWillPop () async{
-    if(_currentIndex != 0){
-      setState (()=> _currentIndex = 0);
-      _pageController.animateToPage(0, duration: Duration(milliseconds: 300), curve: Curves.easeIn);
-    }else{
-      await SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop', true);
+  Future _onWillPop() async {
+    if (_currentIndex != 0) {
+      setState(() => _currentIndex = 0);
+      _pageController.animateToPage(0,
+          duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+    } else {
+      await SystemChannels.platform
+          .invokeMethod<void>('SystemNavigator.pop', true);
     }
   }
 
@@ -127,15 +80,26 @@ class _HomePageState extends State<HomePage> {
           iconSize: 22,
           onTap: (index) => onTabTapped(index),
         ),
-        body: PageView(
-          controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),  
-          children: <Widget>[
-            Explore(),
-            StatesPage(),
-            BlogPage(),
-            BookmarkPage(),
-            ProfilePage(),
+        body: Column(
+          children: [
+            Expanded(
+              child: _HomeHeader(onRefresh: onRefresh),
+              flex: 2,
+            ),
+            Expanded(
+              flex: 8,
+              child: PageView(
+                controller: _pageController,
+                physics: NeverScrollableScrollPhysics(),
+                children: <Widget>[
+                  AddressDetailHomePage(),
+                  BedgeHomePage(),
+                  MintWaitPage(),
+                  NoticePage(),
+                  ProfilePage(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -144,5 +108,132 @@ class _HomePageState extends State<HomePage> {
 
   void test(int index) {
     GetIt.instance.get<Keycloak>().endSession();
+  }
+
+  void onRefresh() {
+    setState(() {
+
+    });
+  }
+}
+
+class _HomeHeader extends StatefulWidget {
+  final VoidCallback onRefresh;
+
+  const _HomeHeader({Key? key, required this.onRefresh}) : super(key: key);
+
+  @override
+  State<_HomeHeader> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<_HomeHeader> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 5, right: 5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      Config().appName,
+                      style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'Muli',
+                          fontWeight: FontWeight.w900,
+                          color: Colors.grey[800]),
+                    ),
+                    Text(
+                      'school name',
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600]),
+                    ).tr()
+                  ],
+                ),
+                Spacer(),
+                InkWell(
+                  child: Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.person, size: 28),
+                  ),
+                  onTap: onTap,
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          InkWell(
+            child: Container(
+              alignment: Alignment.centerLeft,
+              margin: EdgeInsets.only(left: 5, right: 5),
+              padding: EdgeInsets.only(left: 15, right: 15),
+              height: 45,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                border: Border.all(color: Colors.grey[300]!, width: 0.5),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: <Widget>[
+                  GetIt.instance.get<AddressManager>().getSelectedAddress() !=
+                          null
+                      ? Text(GetIt.instance
+                          .get<AddressManager>()
+                          .getSelectedAddress()!
+                          .walletName)
+                      : Text("지갑을 선택해 주시길 바랍니다.")
+                ],
+              ),
+            ),
+            onTap: onPressAddressTextButton,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onPressAddressTextButton() async {
+    final addressIndex = await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        builder: (_) {
+          return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: Featured(),
+          );
+        });
+
+    Address? address;
+
+    if (addressIndex != null)
+      address = GetIt.instance.get<AddressManager>().getAddress(addressIndex);
+
+    if (address != null) {
+      GetIt.instance.get<AddressManager>().selectAddress(address);
+      widget.onRefresh();
+    }
+  }
+
+  void onTap() async {
+
   }
 }

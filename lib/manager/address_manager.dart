@@ -32,6 +32,8 @@ class AddressManager {
   final String _jsonWalletName = "walletName";
   final String _mainCodeKey = "mnemonic";
 
+  List<Address> get AddressList => _addressList;
+
   final _storage = new FlutterSecureStorage();
 
   AddressManager() {
@@ -41,8 +43,8 @@ class AddressManager {
   void test() {
     _mainCodeData = "1234567890abedef12345678";
     deleteAddress("asdfasdf", "aef197");
-    createAddress("asdfasdf", "aef197");
   }
+
 
   int getListLength() {
     return _addressList.length;

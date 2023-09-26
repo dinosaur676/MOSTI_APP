@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
-import 'package:travel_hour/blocs/sign_in_bloc.dart';
 import 'package:travel_hour/config/config.dart';
 import 'package:travel_hour/manager/address_manager.dart';
+import 'package:travel_hour/manager/jwt_manager.dart';
 import 'package:travel_hour/manager/keycloak_manager.dart';
-import 'package:travel_hour/pages/done.dart';
+import 'package:travel_hour/manager/profile_manager.dart';
 import 'package:travel_hour/pages/home.dart';
-import 'package:travel_hour/pages/image_loading_page.dart';
-import 'package:travel_hour/services/app_service.dart';
+import 'package:travel_hour/utils/jwt_utils.dart';
 import 'package:travel_hour/utils/next_screen.dart';
-import 'package:travel_hour/utils/snacbar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:travel_hour/widgets/language.dart';
 
@@ -31,143 +29,9 @@ class _SignInPageState extends State<SignInPage> {
   Widget nextPage = HomePage();
 
   handleSkip() {
-    final sb = context.read<SignInBloc>();
-    sb.setGuestUser();
     nextScreen(context, nextPage);
   }
 
-  //
-  //
-  // handleGoogleSignIn() async{
-  //   final sb = context.read<SignInBloc>();
-  //   setState(() => googleSignInStarted = true);
-  //   await AppService().checkInternet().then((hasInternet)async{
-  //     if(hasInternet == false){
-  //       openSnacbar(context, 'check your internet connection!'.tr());
-  //     }else{
-  //       await sb.signInWithGoogle().then((_){
-  //       if(sb.hasError == true){
-  //         openSnacbar(context, 'something is wrong. please try again.'.tr());
-  //         setState(() =>googleSignInStarted = false);
-  //
-  //       }else {
-  //         sb.checkUserExists().then((value){
-  //         if(value == true){
-  //           sb.getUserDatafromFirebase(sb.uid)
-  //           .then((value) => sb.saveDataToSP()
-  //           .then((value) => sb.guestSignout())
-  //           .then((value) => sb.setSignIn()
-  //           .then((value){
-  //             setState(() =>googleSignInStarted = false);
-  //             afterSignIn();
-  //           })));
-  //         } else{
-  //           sb.getJoiningDate()
-  //           .then((value) => sb.saveToFirebase()
-  //           .then((value) => sb.increaseUserCount())
-  //           .then((value) => sb.saveDataToSP()
-  //           .then((value) => sb.guestSignout()
-  //           .then((value) => sb.setSignIn()
-  //           .then((value){
-  //             setState(() => googleSignInStarted = false);
-  //             afterSignIn();
-  //           })))));
-  //         }
-  //           });
-  //
-  //       }
-  //     });
-  //     }
-  //   });
-  // }
-
-  //
-  // handleFacebookSignIn() async{
-  //   final sb = context.read<SignInBloc>();
-  //   setState(() =>facebookSignInStarted = true);
-  //   await AppService().checkInternet().then((hasInternet) async{
-  //     if(hasInternet == false){
-  //       openSnacbar(context, 'check your internet connection!'.tr());
-  //     } else{
-  //       await sb.signInwithFacebook().then((_){
-  //       if(sb.hasError == true){
-  //         openSnacbar(context, 'something is wrong. please try again.'.tr());
-  //         setState(() =>facebookSignInStarted = false);
-  //
-  //       }else {
-  //         sb.checkUserExists().then((value){
-  //         if(value == true){
-  //           sb.getUserDatafromFirebase(sb.uid)
-  //           .then((value) => sb.saveDataToSP()
-  //           .then((value) => sb.guestSignout())
-  //           .then((value) => sb.setSignIn()
-  //           .then((value){
-  //             setState(() =>facebookSignInStarted = false);
-  //             afterSignIn();
-  //           })));
-  //         } else{
-  //           sb.getJoiningDate()
-  //           .then((value) => sb.saveToFirebase()
-  //           .then((value) => sb.increaseUserCount())
-  //           .then((value) => sb.saveDataToSP()
-  //           .then((value) => sb.guestSignout()
-  //           .then((value) => sb.setSignIn()
-  //           .then((value){
-  //             setState(() =>facebookSignInStarted = false);
-  //             afterSignIn();
-  //           })))));
-  //         }
-  //           });
-  //
-  //       }
-  //     });
-  //     }
-  //   });
-  // }
-
-  //
-  // handleAppleSignIn() async{
-  //   final sb = context.read<SignInBloc>();
-  //   setState(() => appleSignInStarted = true);
-  //   await AppService().checkInternet().then((hasInternet) async{
-  //     if(hasInternet == false){
-  //       openSnacbar(context, 'check your internet connection!'.tr());
-  //     }else{
-  //       await sb.signInWithApple().then((_){
-  //       if(sb.hasError == true){
-  //         openSnacbar(context, 'something is wrong. please try again.'.tr());
-  //         setState(() =>appleSignInStarted = false);
-  //
-  //       }else {
-  //         sb.checkUserExists().then((value){
-  //         if(value == true){
-  //           sb.getUserDatafromFirebase(sb.uid)
-  //           .then((value) => sb.saveDataToSP()
-  //           .then((value) => sb.guestSignout())
-  //           .then((value) => sb.setSignIn()
-  //           .then((value){
-  //             setState(() =>appleSignInStarted = false);
-  //             afterSignIn();
-  //           })));
-  //         } else{
-  //           sb.getJoiningDate()
-  //           .then((value) => sb.saveToFirebase()
-  //           .then((value) => sb.increaseUserCount())
-  //           .then((value) => sb.saveDataToSP()
-  //           .then((value) => sb.guestSignout()
-  //           .then((value) => sb.setSignIn()
-  //           .then((value){
-  //             setState(() =>appleSignInStarted = false);
-  //             afterSignIn();
-  //           })))));
-  //         }
-  //           });
-  //
-  //       }
-  //     });
-  //     }
-  //   });
-  // }
 
   handleKeycloakSiginIn() async {
 
@@ -176,13 +40,17 @@ class _SignInPageState extends State<SignInPage> {
     bool response = await GetIt.instance.get<Keycloak>().signInWithAutoCodeExchange();
 
     if (response) {
-
+      setLoginData(GetIt.instance.get<JWTManager>().accessToken!);
       afterSignIn();
     }
   }
 
   getServerData() async {
 
+  }
+
+  setLoginData(String accessToken) {
+    GetIt.instance.registerSingleton<ProfileManager>(ProfileManager(parseJwtPayLoad(accessToken)));
   }
 
   afterSignIn() {

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:travel_hour/manager/jwt_manager.dart';
@@ -16,7 +15,6 @@ class Keycloak {
 
   final String sourceServer = 'http://localhost:8490/login/oauth2/code/keycloak';
 
-  // For a list of client IDs, go to https://demo.duendesoftware.com
   final String _clientId = 'mosti-dev-mobile-client';
   final String _redirectUrl = 'com.emblock.auth:/oauthredirect';
   final String _postLogoutRedirectUrl = 'com.emblock.auth:/';
